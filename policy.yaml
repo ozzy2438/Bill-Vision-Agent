@@ -1,0 +1,17 @@
+version: "1.1.0"
+currency_tolerances:
+  AUD: "0.01"
+  USD: "0.01"
+  EUR: "0.01"
+  GBP: "0.01"
+rules:
+  - {rule_id: REQUIRED, version: "1.1.0", mandatory: true}
+  - {rule_id: EVIDENCE, version: "1.1.0", mandatory: true}
+  - {rule_id: SUPPLIER, version: "1.1.0", mandatory: true}
+  - {rule_id: ORDER, version: "1.1.0", mandatory: true}
+  - {rule_id: CURRENCY, version: "1.1.0", mandatory: true}
+  - {rule_id: TAX_BASIS, version: "1.1.0", mandatory: true}
+  - {rule_id: TOTAL, version: "1.1.0", mandatory: true}
+  - {rule_id: ARITHMETIC, version: "1.1.0", mandatory: false}
+  - {rule_id: LINES, version: "1.1.0", mandatory: false}
+  - {rule_id: DUPLICATE, version: "1.1.0", mandatory: true}

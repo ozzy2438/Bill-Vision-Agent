@@ -1,0 +1,2 @@
+id,po_number,supplier_id,currency,total,tax_basis
+PO-DEMO-001,PO-2026-001,SUP-DEMO-001,AUD,2000.00,inclusive

@@ -1,0 +1,82 @@
+{
+  "started_at": "2026-10-13T15:42:34.621172+00:00",
+  "source": "Own synthetic PDFs, not FATURA",
+  "model": "qwen2.5:7b",
+  "results": [
+    {
+      "demo": "A",
+      "outcome": "passed",
+      "document_id": "2948f13a-7300-4e99-b5b7-089bd1369627",
+      "status": "ready_for_approval",
+      "local_decision": "approve",
+      "total_check": {
+        "result": "pass",
+        "details": {
+          "currency": "AUD",
+          "tolerance": "0.01",
+          "difference": "0.00",
+          "order_total": "2000.00",
+          "invoice_total": "2000.00"
+        },
+        "message": "Invoice 2000.00 AUD; order 2000.00 AUD; difference +0.00 AUD; tolerance 0.01.",
+        "rule_id": "TOTAL",
+        "version": "1.0.0",
+        "mandatory": true,
+        "policy_text": "Use Decimal to compare the invoice and order totals. Absolute difference at most 0.01 passes for supported currencies. There is no percentage allowance. Show the signed difference and document evidence.",
+        "evidence_ids": [
+          "p1-e2"
+        ],
+        "field_sources": [
+          {
+            "field": "total",
+            "source_type": "extracted"
+          }
+        ]
+      }
+    },
+    {
+      "demo": "B",
+      "outcome": "passed",
+      "document_id": "e61672a6-a25c-4625-ac3a-21b54ca2042d",
+      "status": "needs_review",
+      "total_check": {
+        "result": "fail",
+        "details": {
+          "currency": "AUD",
+          "tolerance": "0.01",
+          "difference": "200.00",
+          "order_total": "2000.00",
+          "invoice_total": "2200.00"
+        },
+        "message": "Invoice 2200.00 AUD; order 2000.00 AUD; difference +200.00 AUD; tolerance 0.01.",
+        "rule_id": "TOTAL",
+        "version": "1.0.0",
+        "mandatory": true,
+        "policy_text": "Use Decimal to compare the invoice and order totals. Absolute difference at most 0.01 passes for supported currencies. There is no percentage allowance. Show the signed difference and document evidence.",
+        "evidence_ids": [
+          "p1-e2"
+        ],
+        "field_sources": [
+          {
+            "field": "total",
+            "source_type": "extracted"
+          }
+        ]
+      }
+    },
+    {
+      "demo": "C",
+      "outcome": "passed",
+      "previous_document_id": "2948f13a-7300-4e99-b5b7-089bd1369627",
+      "new_records": 0
+    }
+  ],
+  "readiness": {
+    "database": true,
+    "ollama_model": true,
+    "docling_artifacts": true,
+    "ready": true,
+    "synthetic_demo_only": true
+  },
+  "finished_at": "2026-10-13T15:45:53.440961+00:00"
+}

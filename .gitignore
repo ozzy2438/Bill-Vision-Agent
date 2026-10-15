@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+storage/
+models/
+.runtime/
+data/fatura/
+reference_annotations/
+*.egg-info/

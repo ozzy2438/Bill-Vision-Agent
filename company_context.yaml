@@ -1,0 +1,22 @@
+version: "1.0.0"
+# Explicitly maintained configuration. Corrections never modify this file.
+supplier_profiles:
+  - id: SUP-DEMO-NAMES
+    version: "1.0.0"
+    supplier_id: SUP-DEMO-001
+    # Only the already approved synthetic legal name; no unverified aliases.
+    verified_names: ["Synthetic Office Supplies Pty Ltd"]
+field_hints:
+  - id: AMOUNT-SUBTOTAL-EN
+    version: "1.0.0"
+    field: subtotal
+    labels: ["sub total", "sub-total", "sub_total", "subtotal", "total before tax"]
+  - id: AMOUNT-TAX-EN
+    version: "1.0.0"
+    field: tax_total
+    labels: ["total tax", "tax total", "tax amount", "vat amount", "gst amount", "sales tax", "tax", "vat", "gst"]
+  - id: AMOUNT-TOTAL-EN
+    version: "1.0.0"
+    field: total
+    # Outstanding balance / amount due can differ after payments or credits.
+    labels: ["total including tax", "total excluding tax", "total incl tax", "total excl tax", "grand total", "invoice total", "total amount", "total"]
