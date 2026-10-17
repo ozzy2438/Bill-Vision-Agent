@@ -1,0 +1,61 @@
+{
+  "form-observations": {
+    "correction_saved": true,
+    "controls_rechecked": true,
+    "old_decision_invalidated": true,
+    "rejection_requires_reason": true,
+    "rejection_saved": true,
+    "order_context_separate": true,
+    "blocked_approval_preserved": true,
+    "cached_revalidation": true,
+    "new_processing_attempts": 0,
+    "temporary_database": "billvision_ui_refresh_check",
+    "production_modified": false
+  },
+  "browser-observations": {
+    "runtime": "Instabox box-4b0945",
+    "desktop": "1440x1100",
+    "mobile": "390x844",
+    "actual_document_open": true,
+    "upload_navigation": true,
+    "empty_upload_disabled": true,
+    "video_12_seconds": true,
+    "video_autoplay": false,
+    "mobile_navigation": true,
+    "mobile_overflow": false,
+    "component_event_not_replayed": true,
+    "blocked_approval_preserved": true,
+    "javascript_errors": []
+  },
+  "live-preservation": {
+    "documents": 27,
+    "all_document_details_unchanged": true,
+    "history_events": 103,
+    "health": {
+      "database": true,
+      "ollama_model": true,
+      "docling_artifacts": true,
+      "ready": true,
+      "synthetic_demo_only": true
+    }
+  },
+  "carousel": {
+    "cards": 14,
+    "full_360_ring": true,
+    "preserve_3d": true,
+    "rear_faces": true,
+    "mouse_drag": true,
+    "momentum": true,
+    "nearest_card_snap": true,
+    "card_click_to_front": true,
+    "arrow_and_keyboard_controls": true,
+    "auto_rotation": true,
+    "hover_pause": true,
+    "touch_swipe": true,
+    "reduced_motion": true,
+    "mobile_horizontal_overflow": false,
+    "javascript_errors": [],
+    "performance_claim": "No universal frame-rate guarantee; transforms update in requestAnimationFrame without per-frame React state."
+  },
+  "date": "2026-10-17 Australia/Melbourne"
+}

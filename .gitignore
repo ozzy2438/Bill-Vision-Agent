@@ -8,3 +8,5 @@ models/
 data/fatura/
 reference_annotations/
 *.egg-info/
+frontend/**/node_modules/
+frontend/**/.build/

@@ -1,5 +1,6 @@
 # Bill Vision Agent
 
+Güncel arayüz: **Ana sayfa → Fatura yükle → İncelemeler**. 3B açılış kartlarından doğrudan belge açılır; kısa video uygulamanın içindedir. [Arayüz değişiklikleri ve doğrulama](docs/UI_REFRESH_NOTES.md).
 17 Ekim 2026: proje mevcut [Instabox kutusuna taşındı](docs/INSTABOX.md). Saklanan OCR/model çıktılarıyla 12 toplamın kanıt sorunu giderildi; beş toplam belirsizliği açık bırakıldı. [Değişiklikler, uygulamalı kontrol ve kalan işler](docs/AMOUNT_REVALIDATION_NOTES.md).
 
 Faturayı belge kanıtlarıyla siparişe karşılaştıran, kontrol sonuçlarını gösteren ve insan kararını yerel olarak kaydeden tek kullanıcılı MVP. Fatura okuma ile sipariş kontrolü arasındaki elle veri taşıma işini azaltmayı amaçlar. Base64.ai'ın kapalı mimarisini veya patentlerini uyguladığı iddia edilmez.
@@ -81,7 +82,7 @@ FATURA kaynağı, boyutu, yazar atfı, farklı arka planların aynı iş vakası
 
 ## Farklı faturalarla incelemeyi tamamlama
 
-İnceleme listesinde bekleyen/sonuçlanan kayıtları süzün ve **Listeden belge aç** ile kayda gidin. **Şimdi ne yapmalıyım?** bölümü gereken bilgi ve kararı, yanında kural kimliği/sürümünü gösterir. Belirsiz model adayı doğrulanmış değerden ayrıdır; alıntı hatalıysa gerçek kaynak parça yine görülebilir, doğrulanmamış alıntı gösterilmez.
+İnceleme listesinde bekleyen/sonuçlanan kayıtları süzün ve belgenin yanındaki **Aç →** düğmesiyle kayda gidin. **Sıradaki adımınız** bölümü gereken bilgi ve kararı, yanında kural kimliği/sürümünü gösterir. Belirsiz model adayı doğrulanmış değerden ayrıdır; alıntı hatalıysa gerçek kaynak parça yine görülebilir, doğrulanmamış alıntı gösterilmez.
 
 Toplam, vergi ve ara toplam için değer, kaynak etiket, yakın metin, gerçek sayfa/konum ve kullanılan ipucu saklanır. Aynı satırın ayrı OCR parçaları yalnızca mevcut kutular hizalıysa birlikte değerlendirilir; ayrı parçalar ve kutuları korunur. Bir sayının metinde bulunması tek başına alan eşleşmesi değildir. İnsan düzeltmesinde kaynak metin önceki OCR kaynağıdır; yeni değerin modelden geldiği iddia edilmez.
 
