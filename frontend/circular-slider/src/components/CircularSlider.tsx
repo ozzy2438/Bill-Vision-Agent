@@ -155,7 +155,7 @@ export function CircularSlider({cards, radius = 330, rotationSpeed = 3, autoRota
       </div></div>
     </div>
     <div className="selection-row flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-5">
-      <div className="min-w-0 text-center sm:text-left"><p className="selected-name" title={card.subtitle}>{card.subtitle}</p><p className="selected-status">{card.status}</p></div>
+      <div className="min-w-0 text-center sm:text-left"><p className="selected-name" title={card.subtitle}>{card.title}{card.amount && <b> · {card.amount}</b>}</p><p className={`selected-status tone-${card.statusTone ?? 'demo'}`}><span className="card-dot"/>{card.status} · {card.subtitle}</p></div>
       {onOpen && card.documentId && <button type="button" className="open-document" onClick={() => onOpen(card)}>İncelemeyi aç <span aria-hidden="true">↗</span></button>}
     </div>
     <SliderControls selectedIndex={selected} count={count} paused={paused} reducedMotion={reduced}

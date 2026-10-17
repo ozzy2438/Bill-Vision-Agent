@@ -1,6 +1,6 @@
 # Bill Vision Agent
 
-Güncel arayüz: **Ana sayfa → Fatura yükle → İncelemeler**. 3B açılış kartlarından doğrudan belge açılır; kısa video uygulamanın içindedir. [Arayüz değişiklikleri ve doğrulama](docs/UI_REFRESH_NOTES.md).
+Güncel arayüz: **Genel bakış → Fatura yükle → İncelemeler**. Yenilenen tasarım sistemi, renkli durum etiketleri, göstergeler ve kontrol ızgarası; 3B açılış kartlarından doğrudan belge açılır, kısa video uygulamanın içindedir. [Arayüz değişiklikleri ve doğrulama](docs/UI_REFRESH_NOTES.md).
 17 Ekim 2026: proje mevcut [Instabox kutusuna taşındı](docs/INSTABOX.md). Saklanan OCR/model çıktılarıyla 12 toplamın kanıt sorunu giderildi; beş toplam belirsizliği açık bırakıldı. [Değişiklikler, uygulamalı kontrol ve kalan işler](docs/AMOUNT_REVALIDATION_NOTES.md).
 
 Faturayı belge kanıtlarıyla siparişe karşılaştıran, kontrol sonuçlarını gösteren ve insan kararını yerel olarak kaydeden tek kullanıcılı MVP. Fatura okuma ile sipariş kontrolü arasındaki elle veri taşıma işini azaltmayı amaçlar. Base64.ai'ın kapalı mimarisini veya patentlerini uyguladığı iddia edilmez.

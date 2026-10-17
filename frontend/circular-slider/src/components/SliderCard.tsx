@@ -6,6 +6,9 @@ export interface InvoiceCard {
   subtitle: string;
   status: string;
   tone?: 'paper' | 'charcoal';
+  /** Colour of the status dot; mirrors the review status, never changes it. */
+  statusTone?: 'warn' | 'ready' | 'ok' | 'danger' | 'info' | 'violet' | 'muted' | 'demo';
+  amount?: string;
   documentId?: string;
 }
 
@@ -41,8 +44,9 @@ export function SliderCard({ card, index, angle, radius, width, height, selected
         <span className="card-index">{String(index + 1).padStart(2, '0')} / BELGE</span>
         <span className="card-title">{card.title}</span>
         <span className="card-subtitle">{card.subtitle}</span>
-        <span className="document-lines" aria-hidden="true"><i /><i /><i /><i /></span>
-        <span className="card-footer"><span className="card-dot" />{card.status}</span>
+        {card.amount ? <span className="card-amount">{card.amount}</span>
+          : <span className="document-lines" aria-hidden="true"><i /><i /><i /><i /></span>}
+        <span className={`card-footer tone-${card.statusTone ?? 'demo'}`}><span className="card-dot" />{card.status}</span>
       </span>
       <span className="card-face card-back" aria-hidden="true">
         <span className="back-brand">✳</span><span className="back-wordmark">bill vision</span>

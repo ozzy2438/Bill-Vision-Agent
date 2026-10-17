@@ -29,3 +29,16 @@ Canlı uygulamadaki 27 belgenin alanları ve toplam 103 geçmiş kaydı, değiş
 Yeni 25-fatura çıkarımı, eski üç demo veya yük testi çalıştırılmadı. Gerçek iPhone/Safari ve farklı kullanıcılarla kullanılabilirlik çalışması yapılmadı; ölçülmemiş FPS veya kullanım kolaylığı oranı iddia edilmiyor. Bu değişiklik arayüzü yeniler; önceki rapordaki şirket kaydı ve belirsiz fatura bilgisi eksiklerini kendiliğinden çözmez.
 
 Makine tarafından kaydedilen kontrol sonuçları: [UI_REFRESH_OBSERVATIONS.json](UI_REFRESH_OBSERVATIONS.json).
+
+## Profesyonel görünüm yenilemesi (17 Ekim 2026, ikinci tur)
+
+Yalnızca arayüz katmanı değişti; inceleme kuralları, OCR/model hattı ve veritabanı şeması aynı kaldı.
+
+- **Tasarım sistemi:** `assets/interface.css` renk, gölge, durum tonu ve bileşen belirteçleriyle yeniden yazıldı. Inter yazı tipi `static/fonts/` altında yerel olarak sunulur (SIL OFL 1.1); CDN kullanılmaz. Simgeler, Streamlit'in HTML temizleyicisi satır içi SVG'yi kaldırdığı için CSS maskeleriyle çizilir (`billvision/presentation.py`).
+- **Açılış:** daha net değer önerisi, “İncelemelere git · N bekliyor” ikinci eylemi, güven rozetleri, yavaş hareketli arka plan. Kartlar gerçek kayıtlarda tedarikçi, tutar ve renkli durum noktası gösterir; temsili kartlarda tutar uydurulmaz.
+- **Genel bakış:** sayaç animasyonlu dört gösterge (bekleyen, karara hazır, sonuçlanan, tamamlanma oranı); öncelikli işler karara hazır belgelerle başlar; adım kartları ve yükleme çağrısı.
+- **Listeler:** her satırda durum simgesi, tedarikçi · fatura no · tarih, tutar ve “x/y kontrol uygun” çubuğu, renkli durum etiketi; karara hazır belgeler için birincil “Karar ver” düğmesi. İncelemelerde “Karara hazır” filtresi ve tedarikçiye göre arama eklendi.
+- **Belge:** başlık kartında durum ve genel toplam, renkli “Sıradaki adımınız” bandı ve kontrol halkası, tüm kuralların tek bakışta görüldüğü kontrol ızgarası.
+- **API:** `GET /documents` satırlarına yalnızca gösterim için `supplier_name`, `total`, `currency`, `checks_passed`, `checks_total` eklendi; değerler kayıtlı incelemeden değiştirilmeden okunur.
+
+Doğrulama: sahte bir API ile Chromium'da 1440 px ve 390 px ekran görüntüleri alındı; açılıştaki “İncelemelere git”, listeden “Karar ver” ve Karar sekmesi gerçek tıklamalarla açıldı; 390 px'de yatay taşma yok. Gerçek veritabanı/Ollama ile uçtan uca çalıştırma bu turda yapılmadı.

@@ -83,8 +83,13 @@ def documents():
         events = conn.execute("SELECT document_id,kind,revision,payload FROM review_events ORDER BY id").fetchall()
         for doc in rows:
             doc.update(review_state(doc, [h for h in events if h["document_id"] == doc["id"]]))
-            doc.pop("invoice")
-            doc.pop("checks")
+            # Display-only summary for list rows; values come unchanged from the stored review.
+            invoice = doc.pop("invoice") or {}
+            checks = doc.pop("checks") or []
+            for name in ("supplier_name", "total", "currency"):
+                doc[name] = (invoice.get(name) or {}).get("value")
+            doc["checks_passed"] = sum(c["result"] == "pass" for c in checks)
+            doc["checks_total"] = len(checks)
         return serializable(rows)
 
 

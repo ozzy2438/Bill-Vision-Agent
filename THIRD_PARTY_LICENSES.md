@@ -4,7 +4,7 @@
 
 Application source is MIT (`LICENSE`). `uv.lock` fixes the complete Python dependency graph and artifact hashes. `docs/software-license-inventory.json` records installed distribution versions and their declared licenses. The distributions' own notices remain authoritative.
 
-Main components: Docling MIT; FastAPI MIT; Pydantic MIT; Streamlit Apache-2.0; psycopg LGPL-3.0; PostgreSQL PostgreSQL License; Ollama MIT; Tesseract Apache-2.0; PyTorch BSD-3-Clause; Pillow HPND; ReportLab BSD; pypdf BSD-3-Clause. Docling's installed EasyOCR dependency is not selected or used for OCR, and its models are not downloaded.
+Main components: Docling MIT; FastAPI MIT; Pydantic MIT; Streamlit Apache-2.0; psycopg LGPL-3.0; PostgreSQL PostgreSQL License; Ollama MIT; Tesseract Apache-2.0; PyTorch BSD-3-Clause; Pillow HPND; ReportLab BSD; pypdf BSD-3-Clause. The interface bundles the Inter variable font (`static/fonts/`, SIL Open Font License 1.1, copied in `static/fonts/OFL-Inter.txt`); React MIT and Tailwind CSS MIT are build-time only for the opening component. Docling's installed EasyOCR dependency is not selected or used for OCR, and its models are not downloaded.
 
 ## Downloaded models
 

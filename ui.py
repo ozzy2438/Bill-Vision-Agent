@@ -10,14 +10,14 @@ import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 from billvision.presentation import (
-    ASSETS, RESULT_NAMES, RULE_NAMES, field_name, plain_message,
-    stat_html, status_label,
+    ASSETS, RESULT_NAMES, RULE_NAMES, check_grid_html, doc_row_html, doc_side_html,
+    field_name, format_money, icon, icon_css, kpi_html, money, pill, plain_message, status_label, status_tone,
 )
 
 load_dotenv()
 API = os.getenv("API_URL", "http://127.0.0.1:8000")
-st.set_page_config(page_title="Bill Vision · Faturalar net", page_icon="✳", layout="wide")
-st.html("<style>" + (ASSETS / "interface.css").read_text() + "</style>")
+st.set_page_config(page_title="Bill Vision · Kanıta dayalı fatura kontrolü", page_icon="✳", layout="wide")
+st.html("<style>" + (ASSETS / "interface.css").read_text() + icon_css() + "</style>")
 circular_slider = components.declare_component("billvision_circular_slider", path=str(ASSETS / "circular-slider"))
 
 
@@ -61,7 +61,11 @@ def navigate(page, document_id=None):
 
 
 def footer():
-    st.html('<div class="footer">Demo çalışma alanı · Örnek faturalar ve şirket kayıtları sentetiktir. Onaylar uygulamada tutulur; ödeme yapılmaz.</div>')
+    st.html(f'<div class="footer"><span>{icon("lock", 14)} Demo çalışma alanı · Örnek faturalar ve şirket kayıtları sentetiktir.</span><span>Onaylar uygulamada tutulur; ödeme yapılmaz.</span></div>')
+
+
+def page_header(eyebrow, title, subtitle):
+    st.html(f'<header class="page-header"><span class="eyebrow">{escape(eyebrow)}</span><h1>{escape(title)}</h1><p>{escape(subtitle)}</p></header>')
 
 
 @st.dialog("Bir faturadan net bir karara", width="large")
@@ -91,19 +95,31 @@ closed = [d for d in docs if d.get("queue_state") == "closed"]
 order_ids = [None] + [p["id"] for p in orders]
 order_names = {p["id"]: f"{p['po_number']} · {p['supplier_name']} · {p['total']} {p['currency']}" for p in orders}
 
+ready = [d for d in pending if d.get("status") == "ready_for_approval"]
+completion = round(100 * len(closed) / len(docs)) if docs else 0
+active_nav = "reviews" if page == "detail" else page
+
 with st.sidebar:
-    st.html('<div class="brand"><span class="brand-mark">✳</span>bill vision<span style="font-size:10px;color:#66775c;letter-spacing:1px">DEMO</span></div><div class="nav-label">ÇALIŞMA ALANIM</div>')
-    for label, destination, icon in [("Ana sayfa", "home", ":material/home:"), ("Fatura yükle", "upload", ":material/add_circle:"), (f"İncelemeler · {len(pending)}", "reviews", ":material/description:")]:
-        if st.button(label, icon=icon, type="primary" if page == destination or (destination == "reviews" and page == "detail") else "secondary", use_container_width=True):
+    st.html('<div class="brand"><span class="brand-mark">✳</span><span>bill vision</span><span class="brand-tag">DEMO</span></div>')
+    if st.button("Yeni fatura yükle", icon=":material/upload:", type="primary", use_container_width=True, key="nav_cta"):
+        navigate("upload")
+    st.html('<div class="nav-label">ÇALIŞMA ALANIM</div>')
+    # Highlight the current page's nav item; the buttons themselves stay ordinary Streamlit buttons.
+    st.html(f"<style>.st-key-nav_{active_nav} button {{background:var(--nav-active) !important;color:var(--brand-ink) !important;font-weight:650 !important;box-shadow:inset 3px 0 0 var(--brand);}}</style>")
+    for label, destination, nav_icon in [("Genel bakış", "home", ":material/space_dashboard:"), ("Fatura yükle", "upload", ":material/add_circle:"), ("İncelemeler", "reviews", ":material/inbox:")]:
+        if st.button(label + (f"  ·  {len(pending)}" if destination == "reviews" and pending else ""), icon=nav_icon, type="tertiary", use_container_width=True, key="nav_" + destination):
             navigate(destination)
-    st.html('<div class="side-note"><b>Her adımda kontrol sizde.</b><p>Bill Vision bilgileri bir araya getirir. Belirsizlikleri görür, son kararı siz verirsiniz.</p></div>')
-    if st.button("Nasıl çalışır?", icon=":material/play_circle:", use_container_width=True):
+    st.html(f'<div class="side-progress"><div class="side-progress-top"><span>İnceleme ilerlemesi</span><b>%{completion}</b></div>'
+            f'<div class="kpi-bar"><span style="width:{completion}%"></span></div>'
+            f'<p><b>{len(closed)}</b> sonuçlandı · <b>{len(pending)}</b> bekliyor{f" · <b>{len(ready)}</b> karara hazır" if ready else ""}</p></div>')
+    if st.button("Nasıl çalışır?", icon=":material/play_circle:", type="tertiary", use_container_width=True, key="nav_video"):
         intro_video()
-    motion = st.toggle("Açılış animasyonu", value=True, help="Hareketi kapatabilirsiniz. Cihazınızın azaltılmış hareket tercihi de dikkate alınır.")
-    st.caption("Kişisel çalışma alanı · Demo")
+    motion = st.toggle("Animasyon", value=True, help="Hareketi kapatabilirsiniz. Cihazınızın azaltılmış hareket tercihi de dikkate alınır.")
+    st.html('<div class="side-foot"><b>Her adımda kontrol sizde.</b> Bill Vision bilgileri toplar ve belirsizlikleri gösterir; son kararı siz verirsiniz.</div>')
 
 page_title = {"home": "Genel bakış", "upload": "Yeni fatura", "reviews": "İncelemeler", "detail": "Belge inceleme"}.get(page, "Genel bakış")
-st.html(f'<div class="topline"><span>Çalışma alanım &nbsp; / &nbsp; <b>{page_title}</b></span><span class="health"><i></i>{"İşlemeye hazır" if health["ready"] else "İşleme hazır değil"}</span></div>')
+st.html(f'<div class="topline"><span class="crumbs">Çalışma alanım <i>/</i> <b>{page_title}</b></span>'
+        f'<span class="health {"" if health["ready"] else "down"}"><i></i>{"Sistem hazır · İşlemeye açık" if health["ready"] else "İşleme hazır değil"}</span></div>')
 if not health["ready"]:
     st.warning("Yeni belge işleme şu anda hazır değil. Mevcut incelemelerinize devam edebilirsiniz.")
     with st.expander("Bağlantı ayrıntıları"):
@@ -111,21 +127,26 @@ if not health["ready"]:
 
 
 def document_row(item, key):
-    with st.container(border=True):
-        info, state, button = st.columns([5, 2, 1.3], vertical_alignment="center")
-        with info:
-            st.html(f'<div class="doc-row"><b><span class="doc-icon">BELGE</span>{escape(item["original_name"])}</b><p>{escape(plain_message(item.get("next_action", "Belgeyi açıp inceleyin.")))}</p></div>')
-        with state:
-            st.html(f'<span class="badge {"closed" if item.get("decision") else ""}">{escape(status_label(item))}</span>')
+    with st.container(border=True, key="row_" + key):
+        info, side, state, button = st.columns([5, 1.8, 1.8, 1.45], vertical_alignment="center")
+        info.html(doc_row_html(item))
+        side.html(doc_side_html(item))
+        state.html(pill(status_label(item), status_tone(item)))
         with button:
-            if st.button("Aç →", key=key, use_container_width=True):
+            label = "Karar ver" if item.get("status") == "ready_for_approval" and not item.get("decision") else "İncele" if not item.get("decision") else "Görüntüle"
+            if st.button(label + "  →", key=key, type="primary" if label == "Karar ver" else "secondary", use_container_width=True):
                 navigate("detail", item["id"])
+
+
+# Quick wins first: documents ready for a decision, then items needing review.
+PRIORITY = {"ready_for_approval": 0, "needs_review": 1, "suspected_duplicate": 2, "error": 3}
 
 
 if page == "home":
     carousel_cards = [
-        {"id": item["id"], "documentId": item["id"], "title": f"Fatura {index + 1:02d}",
-         "subtitle": item["original_name"], "status": status_label(item),
+        {"id": item["id"], "documentId": item["id"], "title": item.get("supplier_name") or f"Fatura {index + 1:02d}",
+         "subtitle": item["original_name"], "status": status_label(item), "statusTone": status_tone(item),
+         "amount": format_money(item["total"], item.get("currency")) if item.get("total") else None,
          "tone": "charcoal" if index % 3 == 1 else "paper"}
         for index, item in enumerate(docs[:14])
     ]
@@ -134,49 +155,58 @@ if page == "home":
     while len(carousel_cards) < 14:
         index = len(carousel_cards)
         carousel_cards.append({"id": f"intro-{index}", "title": f"Örnek {index + 1:02d}",
-                               "subtitle": "Tanıtım kartı · Gerçek fatura değildir", "status": "Örnek belge",
+                               "subtitle": "Tanıtım kartı · Gerçek fatura değildir", "status": "Örnek belge", "statusTone": "demo",
                                "tone": "charcoal" if index % 3 == 1 else "paper"})
-    event = circular_slider(cards=carousel_cards, autoRotate=motion, key="opening_carousel", default=None)
+    event = circular_slider(cards=carousel_cards, autoRotate=motion, pending=len(pending), key="opening_carousel", default=None)
     if isinstance(event, dict) and event.get("event_id") != st.session_state.get("carousel_event"):
         st.session_state["carousel_event"] = event.get("event_id")
         if event.get("action") == "upload":
             navigate("upload")
+        elif event.get("action") == "reviews":
+            navigate("reviews")
         elif event.get("action") == "video":
             intro_video()
         elif event.get("action") == "open" and event.get("document_id") in {d["id"] for d in docs}:
             navigate("detail", event["document_id"])
-    st.write("")
-    for col, args in zip(st.columns(3), [("İncelemenizi bekleyen", len(pending), "belge", True), ("Sonuçlandırılan", len(closed), "belge", False), ("Çalışma alanınızdaki", len(docs), "toplam belge", False)]):
-        with col:
-            st.html(stat_html(*args))
-    title, button = st.columns([3, 1])
-    title.html('<div class="section-title"><h2>Kaldığınız yerden devam edin</h2></div>')
-    if button.button("Tüm incelemeler →", use_container_width=True):
+    kpis = [("İncelemenizi bekleyen", len(pending), "belge açık", "clock", "warn", None),
+            ("Kararınıza hazır", len(ready), "kontroller tamam", "ready", "accent", None),
+            ("Sonuçlandırılan", len(closed), f"/ {len(docs)} belge", "ok", "", None),
+            ("Tamamlanma oranı", completion, "çalışma alanında", "target", "", completion)]
+    for col, args in zip(st.columns(4), kpis):
+        col.html(kpi_html(*args))
+    title, button = st.columns([3, 1], vertical_alignment="bottom")
+    title.html('<div class="section-title"><span class="eyebrow">ÖNCELİKLİ İŞLER</span><h2>Kaldığınız yerden devam edin</h2></div>')
+    if button.button("Tüm incelemeler  →", use_container_width=True, type="tertiary", key="all_reviews"):
         navigate("reviews")
     if pending:
-        for item in pending[:3]:
+        for item in sorted(pending, key=lambda d: PRIORITY.get(d.get("status"), 9))[:4]:
             document_row(item, "recent_" + item["id"])
     else:
-        st.success("Bekleyen incelemeniz yok. Hazırsanız yeni bir fatura yükleyebilirsiniz.")
-    st.divider()
-    for col, number, title, body in zip(st.columns(3), ["01", "02", "03"], ["Faturanızı yükleyin", "Birlikte gözden geçirin", "Kararınızı kaydedin"], ["PDF veya fotoğraf. Başlamak için dosyanızı seçin.", "Eksik bilgiler ve dikkat gerektiren noktalar bir arada.", "Düzeltmelerinizi yapın, sonuçları görün, tamamlayın."]):
-        with col:
-            st.html(f'<div class="step"><span class="step-num">{number}</span><div><b>{title}</b><p>{body}</p></div></div>')
+        st.html(f'<div class="empty">{icon("ok", 28)}<b>Bekleyen incelemeniz yok.</b><p>Harika iş. Hazırsanız yeni bir fatura yükleyin.</p></div>')
+    st.html('<div class="section-title spaced"><span class="eyebrow">NASIL ÇALIŞIR</span><h2>Belgeden karara üç adım</h2></div>')
+    steps = [("01", "upload", "Faturanızı yükleyin", "PDF veya fotoğraf. Dosya baytlarından doğrulanır, aynı belge iki kez kaydedilmez."),
+             ("02", "scan", "Kanıtlarıyla gözden geçirin", "Her alanın belgede nerede yazdığını görün. Eksik ve belirsiz bilgiler öne çıkar."),
+             ("03", "user", "Kararınızı kaydedin", "Siparişle karşılaştırılan kontrolleri görün; düzeltin, onaylayın veya gerekçeyle reddedin.")]
+    st.html('<div class="steps">' + "".join(f'<div class="step"><div class="step-head"><span class="step-icon">{icon(ic, 20)}</span><span class="step-num">{n}</span></div><b>{t}</b><p>{b}</p></div>' for n, ic, t, b in steps) + '</div>')
+    with st.container(key="cta_band"):
+        text, cta = st.columns([3, 1.1], vertical_alignment="center")
+        text.html('<div class="cta-text"><b>Sıradaki faturanız hazır mı?</b><p>Yükleyin, Bill Vision alanları ve kanıtları bir araya getirsin. Son karar her zaman sizde.</p></div>')
+        if cta.button("Fatura yükle  →", type="primary", use_container_width=True, key="cta_upload"):
+            navigate("upload")
     footer()
     st.stop()
 
 if page == "upload":
-    st.title("Bir faturayla başlayalım.")
-    st.write("Dosyanızı seçin. Bill Vision bilgileri çıkarsın, siz gözden geçirin.")
-    main, aside = st.columns([2, 1], gap="large")
-    with main, st.container(border=True):
+    page_header("YENİ FATURA", "Bir faturayla başlayalım.", "Dosyanızı bırakın. Bill Vision bilgileri çıkarsın ve kanıtlarıyla göstersin; siz gözden geçirin.")
+    main, aside = st.columns([1.75, 1], gap="large")
+    with main, st.container(border=True, key="upload_card"):
         uploaded = st.file_uploader("Faturanızı buraya bırakın veya dosya seçin", type=["pdf", "png", "jpg", "jpeg"], help="En çok 10 MB ve 5 sayfa. İngilizce, belge başına tek fatura.")
-        st.caption("PDF, PNG veya JPEG · En çok 10 MB / 5 sayfa · İngilizce faturalar")
+        st.html('<div class="chips"><span>PDF</span><span>PNG</span><span>JPEG</span><span>En çok 10 MB</span><span>5 sayfa</span><span>İngilizce faturalar</span></div>')
         context_po = None
-        with st.expander("Bir siparişle ilişkilendirmek istiyorum (isteğe bağlı)"):
+        with st.expander("Bir siparişle ilişkilendirmek istiyorum (isteğe bağlı)", icon=":material/link:"):
             context_po = st.selectbox("Sipariş seçin", order_ids, format_func=lambda x: order_names.get(x, "Sipariş seçilmedi"))
             st.caption("Seçiminiz sizin sağladığınız bağlamdır. Belgeden okunmuş bilgi gibi gösterilmez.")
-        if st.button("Yükle ve incele", type="primary", icon=":material/arrow_forward:", disabled=uploaded is None or not health["ready"], use_container_width=True):
+        if st.button("Yükle ve incelemeye başla", type="primary", icon=":material/arrow_forward:", disabled=uploaded is None or not health["ready"], use_container_width=True, key="upload_submit"):
             if uploaded.size > 10 * 1024 * 1024:
                 st.error("Dosya 10 MB sınırını aşıyor. Daha küçük bir dosya seçin.")
             else:
@@ -184,11 +214,16 @@ if page == "upload":
                 if result:
                     st.session_state["duplicate_notice"] = result.get("duplicate", False)
                     navigate("detail", result["id"])
+        if uploaded is None:
+            st.caption("Başlamak için bir dosya seçin; düğme dosya seçildiğinde etkinleşir.")
     with aside:
-        st.subheader("Sonra ne olacak?")
-        st.write("**1.** Faturadaki bilgiler okunur.\n\n**2.** Eksik veya belirsiz alanlar gösterilir.\n\n**3.** Bilgileri kontrol eder, kararınızı kaydedersiniz.")
-        st.caption("Belge kendiliğinden onaylanmaz. Bu sürüm ödeme veya ERP işlemi yapmaz.")
-    with st.expander("Dosyam yok, örnek belge kullanmak istiyorum"):
+        timeline = [("scan", "Bilgiler okunur", "PDF okuma, OCR ve yerel model alanları çıkarır."),
+                    ("warn", "Belirsizlikler gösterilir", "Eksik veya kanıtı zayıf alanlar işaretlenir."),
+                    ("user", "Siz karar verirsiniz", "Düzeltin, kontrolleri görün, kararınızı kaydedin.")]
+        st.html('<div class="side-card"><span class="eyebrow">SONRA NE OLACAK?</span><ol class="timeline">'
+                + "".join(f'<li><span class="tl-icon">{icon(i, 16)}</span><div><b>{t}</b><p>{b}</p></div></li>' for i, t, b in timeline)
+                + f'</ol><div class="assurance">{icon("lock", 16)}<span>Belge kendiliğinden onaylanmaz. Bu sürüm ödeme veya ERP işlemi yapmaz.</span></div></div>')
+    with st.expander("Dosyam yok, örnek belge kullanmak istiyorum", icon=":material/description:"):
         samples = action(lambda: request("GET", "/samples").json()) or []
         sample = st.selectbox("Örnek belge", [None] + samples, format_func=lambda x: "Örnek seçin" if x is None else f"{x['name']} ({x['source']})")
         if st.button("Örneği incele", disabled=sample is None or not health["ready"]):
@@ -200,18 +235,17 @@ if page == "upload":
     st.stop()
 
 if page == "reviews":
-    st.title("Her fatura, bir sonraki adım.")
-    st.write("İlgilenmeniz gereken belgeyi açın. Ne yapmanız gerektiğini birlikte görelim.")
-    search, submit_search, refresh = st.columns([5, 1, 1])
-    term = search.text_input("Belge ara", placeholder="Dosya adı veya fatura numarası", label_visibility="collapsed")
-    submit_search.button("Ara", icon=":material/search:", use_container_width=True)
+    page_header("İNCELEMELER", "Her fatura, bir sonraki adım.", "İlgilenmeniz gereken belgeyi açın. Karara hazır olanlar en üstte.")
+    search, refresh = st.columns([6, 1], vertical_alignment="bottom")
+    term = search.text_input("Belge ara", placeholder="Dosya adı, tedarikçi veya fatura numarası ile arayın", label_visibility="collapsed", icon=":material/search:")
     if refresh.button("Yenile", icon=":material/refresh:", use_container_width=True):
         st.rerun()
-    queue_filter = st.radio("Belgeleri göster", [f"Bekleyen ({len(pending)})", f"Sonuçlanan ({len(closed)})", f"Tümü ({len(docs)})"], horizontal=True, label_visibility="collapsed")
-    items = pending if queue_filter.startswith("Bekleyen") else closed if queue_filter.startswith("Sonuçlanan") else docs
-    items = [d for d in items if term.casefold() in (d["original_name"] + " " + (d.get("invoice_number") or "")).casefold()]
+    views = {"Bekleyen": pending, "Karara hazır": ready, "Sonuçlanan": closed, "Tümü": docs}
+    queue_filter = st.segmented_control("Belgeleri göster", list(views), default="Bekleyen", format_func=lambda v: f"{v} · {len(views[v])}", label_visibility="collapsed", key="queue_filter") or "Bekleyen"
+    items = sorted(views[queue_filter], key=lambda d: (d.get("queue_state") == "closed", PRIORITY.get(d.get("status"), 9)))
+    items = [d for d in items if term.casefold() in " ".join([d["original_name"], d.get("invoice_number") or "", d.get("supplier_name") or ""]).casefold()]
     if not items:
-        st.info("Bu görünümde belge yok. Aramanızı değiştirebilir veya yeni bir fatura yükleyebilirsiniz.")
+        st.html(f'<div class="empty">{icon("layers", 28)}<b>Bu görünümde belge yok.</b><p>Aramanızı değiştirebilir veya yeni bir fatura yükleyebilirsiniz.</p></div>')
     for item in items:
         document_row(item, "queue_" + item["id"])
     footer()
@@ -226,21 +260,32 @@ if not doc:
     if st.button("İncelemelere dön"):
         navigate("reviews")
     st.stop()
-if st.button("← İncelemelere dön"):
+if st.button("İncelemelere dön", icon=":material/arrow_back:", type="tertiary"):
     navigate("reviews")
-st.title(doc["original_name"])
-st.caption(f"{status_label(doc)} · Güncelleme {doc['revision']}")
+tone = status_tone(doc)
+invoice = doc["invoice"]
+summary_values = {name: (invoice or {}).get(name, {}).get("value") for name in ("supplier_name", "invoice_number", "invoice_date", "total", "currency")}
+meta = " · ".join(escape(str(v)) for v in (summary_values["supplier_name"], summary_values["invoice_number"], f"Güncelleme {doc['revision']}") if v)
+st.html(f'<section class="doc-hero"><div class="doc-hero-main"><span class="doc-icon big {tone}">{icon("file", 26)}</span><div>'
+        f'<div class="doc-hero-pills">{pill(status_label(doc), tone)}</div><h1>{escape(doc["original_name"])}</h1><p>{meta}</p></div></div>'
+        f'<div class="doc-hero-amount"><small>Genel toplam</small><b class="tabular">{money(summary_values["total"], summary_values["currency"])}</b></div></section>')
 if notice := st.session_state.pop("saved_notice", None):
-    st.success(notice)
+    st.success(notice, icon=":material/check_circle:")
 if st.session_state.pop("duplicate_notice", False):
-    st.info("Bu dosya zaten kayıtlı. Mevcut incelemeyi açtık; ikinci bir kayıt oluşturulmadı.")
-st.info("**Sıradaki adımınız**\n\n" + plain_message(doc["next_action"]))
+    st.info("Bu dosya zaten kayıtlı. Mevcut incelemeyi açtık; ikinci bir kayıt oluşturulmadı.", icon=":material/content_copy:")
+passed = sum(c["result"] == "pass" for c in doc["checks"])
+progress = round(100 * passed / len(doc["checks"])) if doc["checks"] else 0
+st.html(f'<section class="next-step {tone}"><span class="next-icon">{icon(tone if tone in ("warn", "danger", "ok", "ready") else "info", 22)}</span>'
+        f'<div class="next-body"><span class="eyebrow">SIRADAKİ ADIMINIZ</span><p>{escape(plain_message(doc["next_action"]))}</p></div>'
+        f'<div class="next-progress"><div class="ring" style="--p:{progress}"><span>{passed}/{len(doc["checks"])}</span></div><small>kontrol<br>uygun</small></div></section>')
+if doc["checks"]:
+    st.html(check_grid_html(doc["checks"]))
 if doc.get("prior_decision_invalidated"):
     st.warning("Bilgiler değiştiği için önceki karar geçersiz. Güncel kontrolleri inceleyip yeniden karar verin.")
 if doc.get("required_actions"):
-    with st.expander(f"Neleri gözden geçirmeliyim? · {len(doc['required_actions'])} konu"):
+    with st.expander(f"Neleri gözden geçirmeliyim? · {len(doc['required_actions'])} konu", icon=":material/checklist:"):
         for item in doc["required_actions"]:
-            st.write("**" + plain_message(item["action"]) + "**")
+            st.markdown("**" + plain_message(item["action"]) + "**")
             st.caption(plain_message(item["reason"]) + f" · {item['rule_id']} v{item['version']}")
 changed = any(h["kind"] in {"correction", "context_changed", "evidence_revalidated"} and h["revision"] == doc["revision"] for h in doc["history"])
 if changed:
@@ -261,7 +306,7 @@ if doc["error"]:
 
 left, right = st.columns([1, 1.2], gap="large")
 with left:
-    st.subheader("Faturanız")
+    st.html('<div class="panel-title">Orijinal belge</div>')
     file_response = action(lambda: request("GET", f"/documents/{doc_id}/file"), "Belge görüntüleniyor…")
     if file_response is not None:
         data = file_response.content
@@ -277,9 +322,8 @@ with left:
         else:
             st.image(data, use_container_width=True)
 
-invoice = doc["invoice"]
 with right:
-    info_tab, order_tab, decision_tab = st.tabs(["Fatura bilgileri", "Sipariş", "Karar"])
+    info_tab, order_tab, decision_tab = st.tabs([":material/receipt_long: Fatura bilgileri", ":material/link: Sipariş", ":material/gavel: Karar"])
     with info_tab:
         if invoice:
             editable = {k: v for k, v in invoice.items() if isinstance(v, dict)}
@@ -288,9 +332,10 @@ with right:
             summary = []
             for name in ("supplier_name", "invoice_number", "total", "currency"):
                 value = invoice[name]["value"]
-                summary.append(f'<div class="field-box {"missing" if value is None else ""}"><small>{field_name(name)}</small><b>{escape(str(value)) if value is not None else "Kontrol gerekiyor"}</b></div>')
+                shown = money(value) if name == "total" and value is not None else escape(str(value)) if value is not None else "Kontrol gerekiyor"
+                summary.append(f'<div class="field-box {"missing" if value is None else ""}"><small>{icon("warn" if value is None else "ok", 14)} {field_name(name)}</small><b>{shown}</b></div>')
             st.html('<div class="field-summary">' + ''.join(summary) + '</div>')
-            st.write("**Bir bilgiyi kontrol edin veya düzeltin**")
+            st.html('<div class="panel-title">Bir bilgiyi kontrol edin veya düzeltin</div>')
             field_key = "field_" + doc_id
             if field_key not in st.session_state:
                 st.session_state[field_key] = next((k for k in ["supplier_name", "invoice_number", "invoice_date", "total", "currency"] + list(editable) if editable[k]["value"] is None), next(iter(editable)))
@@ -344,7 +389,7 @@ with right:
         else:
             st.warning("Henüz doğrulanmış fatura bilgisi yok. İşlem hatasını inceleyin veya Karar bölümüne geçin.")
     with order_tab:
-        st.subheader("Bu fatura hangi siparişe ait?")
+        st.html('<div class="panel-title">Bu fatura hangi siparişe ait?</div>')
         if invoice:
             st.write("**Belgede okunan sipariş numarası:** " + (invoice["document_po_number"]["value"] or "Bulunamadı"))
             st.caption("Eşleşmenin kaynağı: " + {"none": "Henüz eşleşme yok", "document_po": "Belgede okunan sipariş numarası", "user_selected": "İnceleyen kişinin seçimi"}.get(doc["match_source"], doc["match_source"]))
@@ -370,7 +415,7 @@ with right:
         else:
             st.info("Sipariş seçebilmek için belgenin önce okunması gerekiyor.")
     with decision_tab:
-        st.subheader("İncelemeyi sonuçlandırın")
+        st.html('<div class="panel-title">İncelemeyi sonuçlandırın</div>')
         if doc["decision"]:
             st.success("Bu inceleme sonuçlandırıldı: " + status_label(doc))
         elif doc["status"] != "ready_for_approval":
@@ -379,8 +424,8 @@ with right:
             note = st.text_area("Karar notunuz", placeholder="Reddediyorsanız gerekçenizi yazın.")
             with st.expander("İnceleyen bilgisi"):
                 decision_actor = st.text_input("Kararı veren", value="local-reviewer")
-            approve = st.form_submit_button("Onayla", type="primary", disabled=doc["status"] != "ready_for_approval" or bool(doc["decision"]), use_container_width=True)
-            reject = st.form_submit_button("Gerekçeyle reddet", disabled=doc["status"] == "processing" or bool(doc["decision"]), use_container_width=True)
+            approve = st.form_submit_button("Onayla", icon=":material/check:", type="primary", disabled=doc["status"] != "ready_for_approval" or bool(doc["decision"]), use_container_width=True)
+            reject = st.form_submit_button("Gerekçeyle reddet", icon=":material/close:", disabled=doc["status"] == "processing" or bool(doc["decision"]), use_container_width=True)
         if approve or reject:
             if reject and not note.strip():
                 st.error("Reddetme gerekçesini yazın.")
@@ -388,7 +433,8 @@ with right:
                 st.rerun()
         st.caption("Kararınız yalnızca bu uygulamada kaydedilir. Ödeme veya ERP işlemi başlatılmaz.")
 
-with st.expander("Kontrol sonuçları ve kullanılan kurallar"):
+st.html('<div class="section-title spaced"><span class="eyebrow">AYRINTILAR</span><h2>Kurallar, geçmiş ve kaynak metin</h2></div>')
+with st.expander("Kontrol sonuçları ve kullanılan kurallar", icon=":material/rule:"):
     for check in doc["checks"]:
         with st.expander(f"{RULE_NAMES.get(check['rule_id'], check['rule_id'])} · {RESULT_NAMES.get(check['result'], check['result'])}"):
             st.write(plain_message(check["message"]))
@@ -405,14 +451,14 @@ with st.expander("Kontrol sonuçları ve kullanılan kurallar"):
         if doc["review"]["model_explanation"]:
             with st.expander("Model açıklaması · karar kaynağı değildir"):
                 st.write(doc["review"]["model_explanation"])
-with st.expander("İnceleme geçmişi ve dışa aktarma"):
+with st.expander("İnceleme geçmişi ve dışa aktarma", icon=":material/history:"):
     st.caption(f"Kayıt {doc_id} · SHA-256 {doc['sha256']}")
     st.json(doc["history"])
     for fmt in ("json", "csv"):
         exported = action(lambda: request("GET", f"/documents/{doc_id}/export/{fmt}"), "Dışa aktarma hazırlanıyor…")
         if exported is not None:
             st.download_button(fmt.upper() + " indir", exported.content, file_name=f"review-{doc_id}.{fmt}", mime="application/json" if fmt == "json" else "text/csv")
-with st.expander("Belgeden okunan metin parçaları"):
+with st.expander("Belgeden okunan metin parçaları", icon=":material/text_snippet:"):
     for item in doc["evidence"]:
         st.write(f"**{item['id']} · Sayfa {item['page']}**")
         st.text(item["text"])
