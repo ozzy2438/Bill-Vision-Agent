@@ -8,9 +8,9 @@ from psycopg.types.json import Jsonb
 
 from billvision.config import settings
 from billvision.db import connection
-from billvision.evidence import canonical, validate_claims
+from billvision.evidence import AMOUNT_FIELDS, EVIDENCE_VERSION, canonical, validate_amount, validate_claims
 from billvision.llm import extract_invoice, write_review
-from billvision.models import HEADER_FIELDS
+from billvision.models import Claim, HEADER_FIELDS
 from billvision.ocr import inspect_file, read_document
 from billvision.rules import evaluate, get_policy
 
@@ -106,6 +106,46 @@ def require_revision(doc, revision):
         raise ValueError("Record changed; reload before editing or deciding")
     if not doc["invoice"]:
         raise ValueError("A successful extraction is required before editing or deciding")
+
+
+def revalidate_evidence(document_id, change):
+    """Revisit unresolved amounts using saved claims and OCR; no new inference."""
+    with connection() as conn:
+        doc = get_document(conn, document_id, lock=True)
+        require_revision(doc, change.revision)
+        if doc["status"] == "processing":
+            raise ValueError("Processing is still in progress")
+        path = Path(doc["stored_path"]).with_name("claims.json")
+        if not path.is_file():
+            raise ValueError("Saved model claims are missing; no OCR/model retry was started")
+        claims = json.loads(path.read_text())
+        changes = []
+        warnings = list(doc["warnings"])
+        for field in sorted(AMOUNT_FIELDS):
+            old = doc["invoice"][field]
+            if old["value"] is not None or old["provenance"]["source_type"] == "human_corrected":
+                continue
+            # Legacy saved values may have currency wrappers. Their original
+            # claim is validated as Claim and retained verbatim in provenance.
+            claim = Claim.model_validate(claims[field])
+            if claim.value is None:
+                continue
+            new, warning = validate_amount(field, claim, doc["evidence"])
+            if old == new:
+                continue
+            changes.append({"field": field, "old": old, "new": new})
+            doc["invoice"][field] = new
+            warnings = [w for w in warnings if w["field"] != field]
+            if warning:
+                warnings.append(warning)
+        if changes:
+            doc["revision"] += 1
+            doc["warnings"] = warnings
+            event(conn, doc, "evidence_revalidated", change.actor, {
+                "changes": changes, "rule_id": "EVIDENCE", "version": EVIDENCE_VERSION,
+                "source": "saved_ocr_and_model_claims", "ocr_called": False, "model_called": False,
+                "prior_decision_invalidated": True})
+            recheck(conn, doc, change.actor)
 
 
 def correct(document_id, change):

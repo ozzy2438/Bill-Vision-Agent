@@ -52,6 +52,9 @@ class Provenance(StrictModel):
     hint_version: str | None = None
     source_fragments: list[dict] = Field(default_factory=list)
     observed_labels: list[dict] = Field(default_factory=list)
+    input_claim: dict | None = None
+    grounding_method: str | None = None
+    evidence_rule_version: str | None = None
 
 
 class InvoiceField(StrictModel):
@@ -66,6 +69,11 @@ class Correction(StrictModel):
     value: str | None
     actor: str = Field(min_length=1, max_length=100)
     reason: str = Field(min_length=1, max_length=1000)
+    revision: int
+
+
+class Revalidation(StrictModel):
+    actor: str = Field(min_length=1, max_length=100)
     revision: int
 
 

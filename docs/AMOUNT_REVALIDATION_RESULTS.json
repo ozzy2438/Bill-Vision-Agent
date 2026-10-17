@@ -1,0 +1,277 @@
+{
+  "generated_at": "2026-10-17T00:14:22.997782+00:00",
+  "execution_host": "Instabox box-4b0945",
+  "source": "existing OCR evidence and saved model claims; no label annotations",
+  "ocr_calls": 0,
+  "model_calls": 0,
+  "previous_missing_totals": 17,
+  "remaining_missing_totals": 5,
+  "recovered_totals": 12,
+  "unchanged_original_and_cached_files": 79,
+  "untouched_other_documents": 10,
+  "database_counts": {
+    "documents": 27,
+    "review_events": 103
+  },
+  "before_summary": {
+    "selected_documents": 25,
+    "processing_attempts": 25,
+    "pending_reviews": 24,
+    "closed_reviews": 1,
+    "processing_errors": 0,
+    "field_warning_documents": 23,
+    "missing_or_uncertain_fields": {
+      "currency": 11,
+      "subtotal": 23,
+      "tax_basis": 25,
+      "tax_total": 21,
+      "invoice_date": 14,
+      "document_po_number": 25,
+      "total": 17,
+      "supplier_name": 14,
+      "supplier_tax_id": 19,
+      "invoice_number": 5
+    }
+  },
+  "after_summary": {
+    "selected_documents": 25,
+    "processing_attempts": 25,
+    "pending_reviews": 24,
+    "closed_reviews": 1,
+    "processing_errors": 0,
+    "field_warning_documents": 22,
+    "missing_or_uncertain_fields": {
+      "currency": 11,
+      "subtotal": 9,
+      "tax_basis": 25,
+      "tax_total": 15,
+      "invoice_date": 14,
+      "document_po_number": 25,
+      "supplier_name": 14,
+      "supplier_tax_id": 19,
+      "invoice_number": 5,
+      "total": 5
+    }
+  },
+  "documents": [
+    {
+      "id": "0027f22c-0127-45c9-a620-4d1df385975c",
+      "document": "Template50_Instance108.jpg",
+      "before_total": null,
+      "after_total": "579.34",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "tax_total",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "4104333a-f408-43a2-af4f-bdbe7dd27c43",
+      "document": "Template48_Instance159.jpg",
+      "before_total": null,
+      "after_total": null,
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "tax_total"
+      ],
+      "remaining_total_uncertainty": "Balance due / amount due is not proof of invoice total; verify the total from the original document or request clarification"
+    },
+    {
+      "id": "45d5e25c-7a27-4f54-83bf-f1f51d5f5fc1",
+      "document": "Template47_Instance58.jpg",
+      "before_total": null,
+      "after_total": "208.07",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "566cdd5a-d667-44d2-83c1-4d056e3205c9",
+      "document": "Template43_Instance180.jpg",
+      "before_total": null,
+      "after_total": "1235.36",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "4bb99231-62be-4d17-8d69-8d9c2b3a9381",
+      "document": "Template41_Instance12.jpg",
+      "before_total": null,
+      "after_total": "481.86",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "d75ddb4b-ac94-4fdd-a571-95474ff50fdd",
+      "document": "Template38_Instance186.jpg",
+      "before_total": null,
+      "after_total": null,
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal"
+      ],
+      "remaining_total_uncertainty": "Balance due / amount due is not proof of invoice total; verify the total from the original document or request clarification"
+    },
+    {
+      "id": "a077b2f5-14f3-4dd8-af7a-6c1fc038af57",
+      "document": "Template37_Instance119.jpg",
+      "before_total": null,
+      "after_total": null,
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "tax_total"
+      ],
+      "remaining_total_uncertainty": "Balance due / amount due is not proof of invoice total; verify the total from the original document or request clarification"
+    },
+    {
+      "id": "86976f59-d447-4bb1-b68a-45001eeb25aa",
+      "document": "Template33_Instance176.jpg",
+      "before_total": null,
+      "after_total": null,
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal"
+      ],
+      "remaining_total_uncertainty": "Balance due / amount due is not proof of invoice total; verify the total from the original document or request clarification"
+    },
+    {
+      "id": "66b026d4-aefc-4619-bb64-a40ab3ecdee7",
+      "document": "Template31_Instance95.jpg",
+      "before_total": null,
+      "after_total": "571.31",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "tax_total",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "d8893c88-0d27-44d2-a91e-d88c21a66582",
+      "document": "Template29_Instance148.jpg",
+      "before_total": null,
+      "after_total": "500.82",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "tax_total",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "4051beea-fc06-491b-b463-f45e79ae141a",
+      "document": "Template16_Instance8.jpg",
+      "before_total": null,
+      "after_total": "549.94",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "cb057606-d5da-484d-9089-5f5f7cfc074a",
+      "document": "Template15_Instance134.jpg",
+      "before_total": null,
+      "after_total": null,
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal"
+      ],
+      "remaining_total_uncertainty": "Amount candidate is absent from, or repeated in, the cited OCR row; check the original document"
+    },
+    {
+      "id": "09cd83e2-aac6-4324-b09f-cda28da03ba8",
+      "document": "Template9_Instance1.jpg",
+      "before_total": null,
+      "after_total": "654.13",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "09237256-c546-4eb9-990b-896221404791",
+      "document": "Template8_Instance162.jpg",
+      "before_total": null,
+      "after_total": "919.54",
+      "before_revision": 1,
+      "after_revision": 2,
+      "changed_amount_values": [
+        "subtotal",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "dc1619f7-ea31-432f-98fb-85508e344227",
+      "document": "Template7_Instance54.jpg",
+      "before_total": null,
+      "after_total": "594.25",
+      "before_revision": 2,
+      "after_revision": 3,
+      "changed_amount_values": [
+        "subtotal",
+        "tax_total",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "b619390c-c41b-48b1-a369-ebef977ea2f2",
+      "document": "Template6_Instance21.jpg",
+      "before_total": null,
+      "after_total": "441.17",
+      "before_revision": 2,
+      "after_revision": 3,
+      "changed_amount_values": [
+        "subtotal",
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    },
+    {
+      "id": "9c189a1d-28d4-414d-bc63-22cd7e095479",
+      "document": "Template3_Instance149.jpg",
+      "before_total": null,
+      "after_total": "478.74",
+      "before_revision": 2,
+      "after_revision": 3,
+      "changed_amount_values": [
+        "total"
+      ],
+      "remaining_total_uncertainty": null
+    }
+  ]
+}

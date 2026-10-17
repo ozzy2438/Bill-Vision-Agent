@@ -109,12 +109,12 @@ if doc.get("required_actions"):
         for item in doc["required_actions"]:
             st.write(f"**{item['rule_id']} v{item['version']}** — {item['action']}")
             st.caption(item["reason"])
-if doc.get("check_changes") and any(h["kind"] in {"correction", "context_changed"} and h["revision"] == doc["revision"] for h in doc["history"]):
+if doc.get("check_changes") and any(h["kind"] in {"correction", "context_changed", "evidence_revalidated"} and h["revision"] == doc["revision"] for h in doc["history"]):
     st.subheader("Bu revizyonda değişen kontroller")
     st.dataframe([{"Kural": c["rule_id"], "Sürüm": c["version"], "Önce": c["before"], "Sonra": c["after"], "Önceki bulgu": c["before_message"], "Güncel bulgu": c["after_message"]} for c in doc["check_changes"]], hide_index=True, use_container_width=True)
     with st.expander("Kontrol farklarının ayrıntıları"):
         st.json(doc["check_changes"])
-elif any(h["kind"] in {"correction", "context_changed"} and h["revision"] == doc["revision"] for h in doc["history"]):
+elif any(h["kind"] in {"correction", "context_changed", "evidence_revalidated"} and h["revision"] == doc["revision"] for h in doc["history"]):
     st.caption("Kontroller yeniden çalıştırıldı; sonuç veya bulgu değişmedi.")
 if doc["error"]:
     st.error(doc["error"])
@@ -146,6 +146,10 @@ with right:
     st.subheader("Çıkarılan alanlar")
     invoice = doc["invoice"]
     if invoice:
+        if st.button("Tutar kanıtlarını mevcut OCR ile yeniden kontrol et"):
+            if action(lambda: request("POST", f"/documents/{doc_id}/revalidate-evidence", json={"actor": "local-reviewer", "revision": doc["revision"]})) is not None:
+                st.rerun()
+        st.caption("Kayıtlı metin kullanılır. İnsan düzeltmeleri ve doğrulanmış alanlar korunur.")
         editable = {k: v for k, v in invoice.items() if isinstance(v, dict)}
         for i, line in enumerate(invoice.get("line_items", [])):
             editable.update({f"line_items.{i}.{k}": v for k, v in line.items()})
@@ -158,7 +162,12 @@ with right:
         st.write("**Kaynak etiket:** " + (prov.get("source_label") or "Doğrulanamadı / uygulanmaz"))
         st.text(prov.get("nearby_text") or "Doğrulanmış yakın metin bağlamı yok.")
         st.caption(f"İpucu: {prov.get('hint_id') or 'Yok'} · Sürüm: {prov.get('hint_version') or 'Yok'} · Sayfa: {prov.get('page') or 'Bilinmiyor'}")
-        st.json(editable[chosen]["provenance"])
+        if prov.get("grounding_method") == "same_row_fragments":
+            st.caption("Etiket ve tutar, aynı satırdaki gerçek OCR parçalarıyla doğrulandı. Gösterilen alıntı tutarın kaynak parçasıdır.")
+        st.json({k: v for k, v in prov.items() if k != "input_claim"})
+        if prov.get("input_claim"):
+            with st.expander("Modelin ilk iddiası — doğrulanmış belge alıntısı değildir"):
+                st.json(prov["input_claim"])
         if editable[chosen]["provenance"]["source_type"] == "human_corrected":
             st.caption("Alıntı önceki OCR kaynağını gösterir; güncel değer insan düzeltmesidir.")
         with st.form("correct_" + doc_id + "_" + str(doc["revision"]) + "_" + chosen):

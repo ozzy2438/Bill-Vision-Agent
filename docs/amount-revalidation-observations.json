@@ -1,0 +1,145 @@
+{
+  "checked_at": "2026-10-17T00:13:07.486510+00:00",
+  "execution_host": "Instabox box-4b0945",
+  "database": "temporary copy; original records untouched",
+  "document": "Template6_Instance21.jpg",
+  "before_total": null,
+  "after_total": "441.17",
+  "before_revision": 2,
+  "after_revision": 3,
+  "source_fragment": "p1-e38",
+  "ui_revalidation_button": true,
+  "ui_check_changes_visible": true,
+  "prior_rejection_invalidated": true,
+  "repeat_noop": true,
+  "stale_revision_http_status": 422,
+  "existing_human_correction_and_decision_unchanged": true,
+  "processing_attempts_before_and_after": 1,
+  "rejected_guard_cases": [
+    "wrong_number",
+    "other_page",
+    "missing_boxes",
+    "duplicate_amount",
+    "missing_id"
+  ],
+  "check_changes": [
+    {
+      "after": "fail",
+      "before": "fail",
+      "rule_id": "REQUIRED",
+      "version": "1.1.0",
+      "after_details": {},
+      "after_message": "Missing or ambiguous fields: supplier_name, invoice_date",
+      "before_details": {},
+      "before_message": "Missing or ambiguous fields: supplier_name, invoice_date, total"
+    },
+    {
+      "after": "fail",
+      "before": "fail",
+      "rule_id": "EVIDENCE",
+      "version": "1.2.0",
+      "after_details": {
+        "warnings": [
+          {
+            "field": "supplier_name",
+            "message": "Missing evidence ID or quotation not found in OCR",
+            "rule_id": "EVIDENCE",
+            "version": "1.1.0"
+          },
+          {
+            "field": "tax_total",
+            "message": "Amount candidate must contain one explicit number, not an expression or an inferred value",
+            "rule_id": "EVIDENCE",
+            "version": "1.2.0"
+          }
+        ],
+        "field_hints": [
+          {
+            "id": "AMOUNT-SUBTOTAL-EN",
+            "field": "subtotal",
+            "version": "1.0.0"
+          },
+          {
+            "id": null,
+            "field": "tax_total",
+            "version": null
+          },
+          {
+            "id": "AMOUNT-TOTAL-EN",
+            "field": "total",
+            "version": "1.0.0"
+          }
+        ],
+        "semantic_gaps": []
+      },
+      "after_message": "Inspect uncertain fields and confirm their meaning against the original document.",
+      "before_details": {
+        "warnings": [
+          {
+            "field": "supplier_name",
+            "message": "Missing evidence ID or quotation not found in OCR",
+            "rule_id": "EVIDENCE",
+            "version": "1.1.0"
+          },
+          {
+            "field": "subtotal",
+            "message": "Missing evidence ID or quotation not found in OCR",
+            "rule_id": "EVIDENCE",
+            "version": "1.1.0"
+          },
+          {
+            "field": "tax_total",
+            "message": "Missing evidence ID or quotation not found in OCR",
+            "rule_id": "EVIDENCE",
+            "version": "1.1.0"
+          },
+          {
+            "field": "total",
+            "message": "Missing evidence ID or quotation not found in OCR",
+            "rule_id": "EVIDENCE",
+            "version": "1.1.0"
+          }
+        ],
+        "field_hints": [
+          {
+            "id": "AMOUNT-SUBTOTAL-EN",
+            "field": "subtotal",
+            "version": "1.0.0"
+          },
+          {
+            "id": null,
+            "field": "tax_total",
+            "version": null
+          },
+          {
+            "id": "AMOUNT-TOTAL-EN",
+            "field": "total",
+            "version": "1.0.0"
+          }
+        ],
+        "semantic_gaps": []
+      },
+      "before_message": "Inspect uncertain fields and confirm their meaning against the original document."
+    },
+    {
+      "after": "not_evaluated",
+      "before": "not_evaluated",
+      "rule_id": "TOTAL",
+      "version": "1.1.0",
+      "after_details": {},
+      "after_message": "Cannot compare totals until order, currency and tax basis are verified.",
+      "before_details": {},
+      "before_message": "Cannot compare totals until order, currency and tax basis are verified."
+    },
+    {
+      "after": "not_evaluated",
+      "before": "not_evaluated",
+      "rule_id": "ARITHMETIC",
+      "version": "1.1.0",
+      "after_details": {},
+      "after_message": "Not evaluated: insufficient components or unknown tax/currency basis.",
+      "before_details": {},
+      "before_message": "Not evaluated: insufficient components or unknown tax/currency basis."
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 # Amaç, mevcut durum ve üretime geçiş standardı
 
+Güncelleme — 17 Ekim 2026: Instabox kurulumu ve 17 toplam belirsizliğinin 12’sinin giderilmesi [güncel sonuç notunda](AMOUNT_REVALIDATION_NOTES.md) yer alıyor. Aşağıdaki süre ölçümleri ve önceki durum, ilk işleme çalışmasının tarihsel kaydıdır.
+
+
 Değerlendirme: 15 Ekim 2026, Australia/Melbourne. Kaynaklar: mevcut kod, README, inceleme kayıtları, FATURA durum raporu ve yerel model logları. Bu çalışma yeni fatura/model çalıştırmaz; mevcut kayıtları inceler. Aşağıdaki hedef mimari henüz uygulanmış değildir.
 
 ## Ürün amacı

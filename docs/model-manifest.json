@@ -1,12 +1,12 @@
 {
-  "created_at": "2026-10-13T15:37:14.231799+00:00",
+  "created_at": "2026-10-17T00:13:47.475549+00:00",
   "model": "qwen2.5:7b",
   "source": "https://registry.ollama.ai/v2/library/qwen2.5/manifests/7b",
   "license": "Apache-2.0",
   "installed": {
     "name": "qwen2.5:7b",
     "model": "qwen2.5:7b",
-    "modified_at": "2026-10-13T15:37:14.190628485Z",
+    "modified_at": "2026-10-17T00:13:47.428537163Z",
     "size": 4683086960,
     "digest": "ef22ea943bedd293981ff7aec2d4194c54b4ef342e218ada39e8276e50a853e0",
     "details": {

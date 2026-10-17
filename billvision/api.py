@@ -11,11 +11,11 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 
 from billvision.config import ROOT, settings
 from billvision.db import connection, initialize, order_rows
-from billvision.models import ContextSelection, Correction, Decision
+from billvision.models import ContextSelection, Correction, Decision, Revalidation
 from billvision.rules import get_policy
 from billvision.review import review_state
 from billvision.company_context import get_company_context
-from billvision.workflow import correct, decide, get_document, process, select_context, upload
+from billvision.workflow import correct, decide, get_document, process, revalidate_evidence, select_context, upload
 
 
 def serializable(value):
@@ -129,6 +129,12 @@ def retry(document_id: UUID):
 @app.post("/documents/{document_id}/corrections")
 def correction(document_id: UUID, change: Correction):
     correct(document_id, change)
+    return detail(document_id)
+
+
+@app.post("/documents/{document_id}/revalidate-evidence")
+def revalidate(document_id: UUID, change: Revalidation):
+    revalidate_evidence(document_id, change)
     return detail(document_id)
 
 

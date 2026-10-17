@@ -1,5 +1,7 @@
 # Bill Vision Agent
 
+17 Ekim 2026: proje mevcut [Instabox kutusuna taşındı](docs/INSTABOX.md). Saklanan OCR/model çıktılarıyla 12 toplamın kanıt sorunu giderildi; beş toplam belirsizliği açık bırakıldı. [Değişiklikler, uygulamalı kontrol ve kalan işler](docs/AMOUNT_REVALIDATION_NOTES.md).
+
 Faturayı belge kanıtlarıyla siparişe karşılaştıran, kontrol sonuçlarını gösteren ve insan kararını yerel olarak kaydeden tek kullanıcılı MVP. Fatura okuma ile sipariş kontrolü arasındaki elle veri taşıma işini azaltmayı amaçlar. Base64.ai'ın kapalı mimarisini veya patentlerini uyguladığı iddia edilmez.
 
 **Bu bir sentetik veri demosudur.** FATURA belgeleri gerçek müşteri faturası değildir. Siparişler ve tedarikçiler ayrıca üretilmiş hayali şirket verileridir. Onay ödeme, e-posta, bankacılık veya ERP yazımı yapmaz.
@@ -83,7 +85,7 @@ FATURA kaynağı, boyutu, yazar atfı, farklı arka planların aynı iş vakası
 
 Toplam, vergi ve ara toplam için değer, kaynak etiket, yakın metin, gerçek sayfa/konum ve kullanılan ipucu saklanır. Aynı satırın ayrı OCR parçaları yalnızca mevcut kutular hizalıysa birlikte değerlendirilir; ayrı parçalar ve kutuları korunur. Bir sayının metinde bulunması tek başına alan eşleşmesi değildir. İnsan düzeltmesinde kaynak metin önceki OCR kaynağıdır; yeni değerin modelden geldiği iddia edilmez.
 
-`company_context.yaml` v1.0.0 onaylı adları ve alan etiketi ipuçlarını; `policy.yaml`/`policy.md` v1.1.0 karşılaştırma ve inceleme kurallarını tutar. Mevcut tedarikçi/sipariş kayıtları korunmuştur. Yeni bir tedarikçi için şirket kayıt sorumlusu doğrulanmış vergi kimliği, ad/eşanlamlılar ve gerçek sipariş bilgilerini sağlamalıdır. Dosyalar elle sürümlenir; inceleyen kişinin düzeltmesi genel kurala dönüşmez. FATURA etiketlerinden şirket ilişkisi üretilmez. Para toleransı mevcut 0.01 tutarıdır.
+`company_context.yaml` v1.0.0 onaylı adları ve alan etiketi ipuçlarını; `policy.yaml`/`policy.md` v1.2.0 karşılaştırma ve inceleme kurallarını tutar. Mevcut tedarikçi/sipariş kayıtları korunmuştur. Yeni bir tedarikçi için şirket kayıt sorumlusu doğrulanmış vergi kimliği, ad/eşanlamlılar ve gerçek sipariş bilgilerini sağlamalıdır. Dosyalar elle sürümlenir; inceleyen kişinin düzeltmesi genel kurala dönüşmez. FATURA etiketlerinden şirket ilişkisi üretilmez. Para toleransı mevcut 0.01 tutarıdır.
 
 Belgede PO yoksa doğrulanmış tedarikçinin adayları gösterilir ve kullanıcı bağlam seçer. Bir veya birden fazla aday, tek başına otomatik eşleşme yaratmaz. Bağlam seçimi alanı değiştirmez; tedarikçi/PO çelişkisi onayı engeller. Düzeltmeden sonra kontrollerin önce/sonra bulguları mevcut `review_events` içinde kaydedilir; önceki karar geçersizleşir. Çözülemeyen belge gerekçeyle yerel olarak reddedilebilir; başarısız çıkarım da reddedilebilir.
 

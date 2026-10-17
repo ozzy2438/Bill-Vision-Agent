@@ -3,7 +3,10 @@ from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 
 from billvision.models import DECIMAL_FIELDS, HEADER_FIELDS, InvoiceClaim, InvoiceField, Provenance
-from billvision.company_context import amount_meaning, observed_label_context
+from billvision.company_context import amount_meaning, label_matches, observed_label_context
+
+EVIDENCE_VERSION = "1.2.0"
+AMOUNT_FIELDS = {"subtotal", "tax_total", "total"}
 
 
 def normalized(text):
@@ -102,32 +105,96 @@ def grounded_value(field, value, quote):
     return result
 
 
+def amount_candidate(field, value):
+    """Read legacy saved claims without inferring a currency or a missing number.
+
+    New model output still uses NumericClaim. Only a known field label and an
+    explicit currency wrapper may surround the one number in an older claim.
+    Human corrections continue to use the stricter canonical() function.
+    """
+    text = value.strip()
+    labels = label_matches(text)
+    if labels and labels[0][0].start() == 0 and labels[0][1]["field"] == field:
+        text = text[labels[0][0].end():].lstrip(" :")
+    currency = r"(?:AUD|USD|EUR|GBP|[$€£])"
+    match = re.fullmatch(rf"(?:{currency}\s*)?(-?\d[\d,]*(?:\.\d+)?)(?:\s*{currency})?", text)
+    if not match:
+        raise ValueError("Amount candidate must contain one explicit number, not an expression or an inferred value")
+    return canonical(field, match[1])
+
+
+def validate_amount(field, claim, evidence):
+    """Ground a candidate in its cited OCR row, never by a document-wide search."""
+    if claim.value is None:
+        return InvoiceField().model_dump(), None
+    item = next((e for e in evidence if e["id"] == claim.evidence_id), None)
+    provenance = Provenance(input_claim=claim.model_dump(), evidence_rule_version=EVIDENCE_VERSION)
+    if item:
+        fragments = nearby_fragments(item, evidence)
+        context = "\n".join(f["text"] for f in fragments)
+        provenance = provenance.model_copy(update={"page": item["page"], "evidence_id": item["id"],
+            "bbox": item.get("bbox"), "nearby_text": context, "source_fragments": fragments,
+            **observed_label_context(field, context)})
+    try:
+        if not item:
+            raise ValueError("Missing evidence ID; the candidate cannot be located in the OCR")
+        value = amount_candidate(field, claim.value)
+        hits = []
+        for fragment in fragments:
+            try:
+                grounded_value(field, value, fragment["text"])
+                hits.append(fragment)
+            except ValueError:
+                continue
+        if len(hits) != 1:
+            raise ValueError("Amount candidate is absent from, or repeated in, the cited OCR row; check the original document")
+        source = hits[0]
+        quoted = (source["id"] == claim.evidence_id and claim.raw_text
+                  and normalized(claim.raw_text) in normalized(source["text"]))
+        if quoted:
+            try:
+                grounded_value(field, value, claim.raw_text)
+            except ValueError:
+                quoted = False
+        provenance = provenance.model_copy(update={"page": source["page"], "evidence_id": source["id"],
+            "bbox": source.get("bbox"), "raw_text": claim.raw_text if quoted else source["text"],
+            "grounding_method": "cited_fragment" if quoted else "same_row_fragments"})
+        meaning, problem = amount_meaning(field, value, context, number)
+        provenance = provenance.model_copy(update=meaning)
+        if problem:
+            due = re.search(r"\b(?:balance[ _]+due|amount[ _]+due)\b", context, re.I)
+            if field == "total" and due and not any(h["field"] == "total" for _, h in label_matches(context)):
+                provenance = provenance.model_copy(update={"source_label": due.group(), "semantic_status": "different_amount_role"})
+                problem = "Balance due / amount due is not proof of invoice total; verify the total from the original document or request clarification"
+            raise ValueError(problem)
+        return InvoiceField(value=value, provenance=provenance).model_dump(), None
+    except (ValueError, InvalidOperation) as exc:
+        warning = {"field": field, "message": str(exc), "rule_id": "EVIDENCE", "version": EVIDENCE_VERSION}
+        return InvoiceField(candidate_value=claim.value, uncertainty=str(exc), provenance=provenance).model_dump(), warning
+
+
 def validate_claims(claims: InvoiceClaim, evidence):
     by_id = {item["id"]: item for item in evidence}
     warnings = []
 
     def convert(field, claim, path):
+        if field in AMOUNT_FIELDS:
+            result, warning = validate_amount(field, claim, evidence)
+            if warning:
+                warnings.append(warning)
+            return result
         if claim.value is None:
             return InvoiceField().model_dump()
         item = by_id.get(claim.evidence_id)
         provenance = Provenance(page=item["page"], evidence_id=item["id"], bbox=item.get("bbox"), nearby_text=item["text"]) if item else Provenance()
-        if item and field in {"subtotal", "tax_total", "total"}:
-            provenance.source_fragments = nearby_fragments(item, evidence)
-            provenance.nearby_text = "\n".join(f["text"] for f in provenance.source_fragments)
-            provenance = provenance.model_copy(update=observed_label_context(field, provenance.nearby_text))
         try:
             if not item or not claim.raw_text or normalized(claim.raw_text) not in normalized(item["text"]):
                 raise ValueError("Missing evidence ID or quotation not found in OCR")
             provenance.raw_text = claim.raw_text
             value = grounded_value(field, claim.value, claim.raw_text)
-            if field in {"subtotal", "tax_total", "total"}:
-                meaning, problem = amount_meaning(field, value, provenance.nearby_text, number)
-                provenance = provenance.model_copy(update=meaning)
-                if problem:
-                    raise ValueError(problem)
             return InvoiceField(value=value, provenance=provenance).model_dump()
         except (ValueError, InvalidOperation) as exc:
-            warnings.append({"field": path, "message": str(exc), "rule_id": "EVIDENCE", "version": "1.1.0"})
+            warnings.append({"field": path, "message": str(exc), "rule_id": "EVIDENCE", "version": EVIDENCE_VERSION})
             return InvoiceField(candidate_value=claim.value, uncertainty=str(exc), provenance=provenance).model_dump()
 
     invoice = {f: convert(f, getattr(claims, f), f) for f in HEADER_FIELDS}

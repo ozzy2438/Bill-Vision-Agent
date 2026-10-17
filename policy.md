@@ -1,4 +1,4 @@
-# Synthetic demo company policy — version 1.1.0
+# Synthetic demo company policy — version 1.2.0
 
 These rules describe invented demo company records, not FATURA business relationships.
 
@@ -7,6 +7,8 @@ Supplier, invoice number, unambiguous date, total and explicit currency are requ
 
 ## EVIDENCE
 Extracted values must reference a real OCR text fragment and a verified quotation. Coordinates are retained only when Docling supplies them. Human corrections retain the prior value and the actor, timestamp and reason. Invalid or truncated extraction requires review. Subtotal, tax and total additionally require an unambiguous association with an approved label in company_context.yaml. Same-row context uses actual OCR boxes and retains each original fragment. The occurrence of a number alone does not verify its field meaning; ambiguous candidates remain visible with a null field value. Hints never supply missing values or override checks.
+
+EVIDENCE v1.2.0 permits repairing an amount citation only within the actual OCR row anchored by the model's evidence ID. Exactly one fragment must contain the candidate number, and an approved label must uniquely establish its role. The original model claim stays separate from the verified quotation and actual source fragment. No document-wide number search or arithmetic-derived total is used. Balance due / amount due alone does not establish invoice total. Legacy saved claims may have their single numeric value separated from a known label/currency wrapper; this never supplies currency or a missing amount. Explicit cached revalidation preserves human corrections and already verified fields, records changes in review_events, and invalidates old decisions when the revision changes.
 
 ## SUPPLIER
 Verify the supplier by an exact approved tax identifier and compatible legal name or explicitly approved alias from the versioned supplier profile. A similar name or equal amount is insufficient. Demo identifiers are deliberately fictional.
